@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: build
-      run: gcc .\src\hide_lolbins.c -o hide_lolbins_x64.exe -s -m64 -lntdll
+      run: gcc .\src\hide_lolbins.c -o .\artifacts\hide_lolbins_x64.exe -s -m64 -lntdll
     - name: gitkeep
       run: rm artifacts/.gitkeep
     - name: artifacts
