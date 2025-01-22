@@ -3,7 +3,7 @@
 #include <winternl.h>
 
 int main() {
-    const char *lolBinCommand = "cmd.exe /k echo This will not be logged in sysmon";
+    const char *lolBinCommand = "cmd.exe /k echo This will not be logged in sysmon test";
 
     // Create spoofed cmdline
     char binary[MAX_PATH];
