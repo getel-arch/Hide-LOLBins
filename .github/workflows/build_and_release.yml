@@ -1,5 +1,6 @@
-name: Build
+name: Build and Release
 
+# Sets the trigger to changing the VERSION file in the main branch
 on:
   push:
     branches:
@@ -7,8 +8,12 @@ on:
     paths:
     - 'VERSION'
 
+# Allows the workflow to create release
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build_and_release:
     runs-on: windows-latest
     steps:
     - name: Sync Repo to the Server
