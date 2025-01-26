@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build & Release
 
 # Sets the trigger to changing the VERSION file in the main branch
 on:
