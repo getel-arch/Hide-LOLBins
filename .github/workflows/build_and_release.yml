@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - 'VERSION'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Sync Repo to the Server
+      uses: actions/checkout@v1
+
+    - name: Compile 64bit Binary
+      run: gcc .\src\hide_lolbins.c -o .\artifacts\hide_lolbins_x64.exe -s -m64 -lntdll
+
+    - name: Remove Placeholder
+      run: Remove-Item artifacts/.gitkeep
+
+    - name: Read Version
+      run: |
+        $version = Get-Content VERSION
+        Write-Output "VERSION=$version" >> $env:GITHUB_ENV
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.VERSION }}
+        name: DFIR-Orc ${{ env.VERSION }}
+        make_latest: true
+        draft: false
+        prerelease: false
+        fail_on_unmatched_files: true
+        files: ./output
