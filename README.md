@@ -1,6 +1,6 @@
 # Hide-LOLBins
 
-[![Build & Release](https://github.com/getel-arch/Hide-LOLBins/actions/workflows/build_and_release.yml/badge.svg)](https://github.com/getel-arch/Hide-LOLBins/actions/workflows/build_and_release.yml)
+[![Build & Release](/../../actions/workflows/build_and_release.yml/badge.svg)](/../../actions/workflows/build_and_release.yml)
  
 ## Build
 ```
