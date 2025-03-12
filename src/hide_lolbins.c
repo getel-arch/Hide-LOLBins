@@ -42,7 +42,7 @@ int main() {
 
     // Get CommandLine member address
     PVOID cmdLineAddress;
-    if (!ReadProcessMemory(pi.hProcess, (PBYTE)processParametersAddress + 0x78, &cmdLineAddress, sizeof(cmdLineAddress), NULL)) {
+    if (!ReadProcessMemory(pi.hProcess, (PBYTE)processParametersAddress + 0x70, &cmdLineAddress, sizeof(cmdLineAddress), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
