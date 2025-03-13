@@ -45,19 +45,19 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("PEB Address: %p\n", bi.PebBaseAddress);
+    printf("PEB Base Address: %p\n", bi.PebBaseAddress);
 
-    // Get RTL_USER_PROCESS_PARAMETERS address
-    PVOID processParametersAddress;
-    if (!ReadProcessMemory(pi.hProcess, (PBYTE)bi.PebBaseAddress + 0x20, &processParametersAddress, sizeof(processParametersAddress), NULL)) {
+    // Get PEB structure
+    PEB peb;
+    if (!ReadProcessMemory(pi.hProcess, (PBYTE)bi.PebBaseAddress, &peb, sizeof(peb), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("Process Parameters Address: %p\n", processParametersAddress);
+    printf("Process Parameters Address: %p\n", peb.ProcessParameters);
 
     // Get CommandLine member address
     PVOID cmdLineAddress;
-    if (!ReadProcessMemory(pi.hProcess, (PBYTE)processParametersAddress + 0x78, &cmdLineAddress, sizeof(cmdLineAddress), NULL)) {
+    if (!ReadProcessMemory(pi.hProcess, peb.ProcessParameters + 0x70, &cmdLineAddress, sizeof(cmdLineAddress), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
