@@ -2,19 +2,26 @@
 #include <windows.h>
 #include <winternl.h>
 
+void replaceAfterFirstSpace(const char *original, char *modified) {
+    const char *firstSpace = strchr(original, ' ');
+    if (firstSpace != NULL) {
+        size_t length = firstSpace - original + 1;
+        strncpy(modified, original, length);
+        memset(modified + length, ' ', strlen(original) - length);
+        modified[strlen(original)] = '\0';
+    } else {
+        strcpy(modified, original);
+    }
+}
+
 int main() {
     const char *lolBinCommand = "cmd.exe /k echo This will not be logged in sysmon test";
 
     // Create spoofed cmdline
-    char binary[MAX_PATH];
-    sscanf(lolBinCommand, "%s", binary);
-    int argsLen = strlen(lolBinCommand) - strlen(binary);
     char spoofedCmdline[MAX_PATH];
-    snprintf(spoofedCmdline, sizeof(spoofedCmdline), "%s%*s", binary, argsLen, "");
+    replaceAfterFirstSpace(lolBinCommand, spoofedCmdline);
 
     // Convert realCmdline to wide character string
-    strcat(binary, " ");
-    strcat(binary, lolBinCommand);
     int realCmdlineLen = MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, NULL, 0);
     wchar_t *realCmdlineW = (wchar_t *)malloc(realCmdlineLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, realCmdlineW, realCmdlineLen);
