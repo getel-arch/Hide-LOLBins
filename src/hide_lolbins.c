@@ -56,15 +56,15 @@ int main() {
     printf("Process Parameters Address: %p\n", peb.ProcessParameters);
 
     // Get CommandLine member address
-    PVOID cmdLineAddress;
-    if (!ReadProcessMemory(pi.hProcess, peb.ProcessParameters + 0x70, &cmdLineAddress, sizeof(cmdLineAddress), NULL)) {
+    RTL_USER_PROCESS_PARAMETERS procParams;
+    if (!ReadProcessMemory(pi.hProcess, peb.ProcessParameters, &procParams, sizeof(procParams), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("Command Line Address: %p\n", cmdLineAddress);
+    printf("Command Line Address: %p\n", procParams.CommandLine.Buffer);
 
     // Change command line
-    if (!WriteProcessMemory(pi.hProcess, cmdLineAddress, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
+    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
