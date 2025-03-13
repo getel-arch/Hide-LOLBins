@@ -13,6 +13,8 @@ int main() {
     snprintf(spoofedCmdline, sizeof(spoofedCmdline), "%s%*s", binary, argsLen, "");
 
     // Convert realCmdline to wide character string
+    strcat(binary, " ");
+    strcat(binary, lolBinCommand);
     int realCmdlineLen = MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, NULL, 0);
     wchar_t *realCmdlineW = (wchar_t *)malloc(realCmdlineLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, realCmdlineW, realCmdlineLen);
