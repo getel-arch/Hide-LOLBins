@@ -47,6 +47,8 @@ int main() {
         return FALSE;
     }
 
+    wprintf(L"%ls\n", realCmdlineW);
+
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, cmdLineAddress, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
         free(realCmdlineW);
