@@ -44,7 +44,7 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("PEB Base Address: %p\n", pbi.PebBaseAddress);
+    printf("[+] PEB base address: %p\n", pbi.PebBaseAddress);
 
     // Get PEB structure
     printf("[+] Reading the PEB structure\n");
@@ -53,7 +53,7 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("Process parameters address: %p\n", peb.ProcessParameters);
+    printf("[+] Process parameters address: %p\n", peb.ProcessParameters);
 
     // Get RTL_USER_PROCESS_PARAMETERS structure
     printf("[+] Reading the RTL_USER_PROCESS_PARAMETERS structure\n");
