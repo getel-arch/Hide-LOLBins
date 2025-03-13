@@ -37,6 +37,7 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
+    printf("PEB Address: %p\n", bi.PebBaseAddress);
 
     // Get RTL_USER_PROCESS_PARAMETERS address
     PVOID processParametersAddress;
@@ -44,6 +45,7 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
+    printf("Process Parameters Address: %p\n", processParametersAddress);
 
     // Get CommandLine member address
     PVOID cmdLineAddress;
@@ -51,6 +53,7 @@ int main() {
         free(realCmdlineW);
         return FALSE;
     }
+    printf("Command Line Address: %p\n", cmdLineAddress);
 
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, cmdLineAddress, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
