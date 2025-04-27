@@ -71,8 +71,10 @@ int main() {
         goto cleanup;
     }
 
-    // Change command line
-    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, 7, 4)) {
+
+    DWORD newUnicodeLen = 7;
+    // Change command line buffer length
+    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, (void*)&newUnicodeLen, 4)) {
         goto cleanup;
     }
 
