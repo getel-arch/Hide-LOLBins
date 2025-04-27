@@ -72,7 +72,7 @@ int main() {
     }
 
     // Change command line
-    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, 7, 4) {
+    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, 7, 4)) {
         goto cleanup;
     }
 
