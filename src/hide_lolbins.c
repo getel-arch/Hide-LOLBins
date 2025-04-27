@@ -72,10 +72,20 @@ int main() {
         goto cleanup;
     }
 
-
-    DWORD newUnicodeLen = 7;
-    // Change command line buffer length
-    if (!WriteProcessMemory(pi.hProcess, offsetof(procParams.CommandLine.Length), (void*)&newUnicodeLen, 4)) {
+    // Address of CommandLine in target process
+    UNICODE_STRING commandLine;
+    if (!ReadProcessMemory(pi.hProcess, (PBYTE)procParams.CommandLine.Buffer, &commandLine, sizeof(commandLine), NULL)) {
+        goto cleanup;
+    }
+    
+    // Calculate the address of the Length field
+    PBYTE lengthAddress = (PBYTE)procParams.CommandLine.Buffer + offsetof(UNICODE_STRING, Length);
+    
+    // New length in bytes (set this to the desired length)
+    USHORT newLength = 7 * sizeof(wchar_t);  // 7 characters (e.g., "cmd.exe") in wide characters
+    
+    // Write the new length
+    if (!WriteProcessMemory(pi.hProcess, lengthAddress, &newLength, sizeof(USHORT), NULL)) {
         goto cleanup;
     }
 
