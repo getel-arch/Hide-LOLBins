@@ -75,6 +75,8 @@ int main() {
     printf("[+] Resuming the main thread\n");
     ResumeThread(pi.hThread);
 
+    sleep(1000);
+
     // Change command line
     if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, spoofedCmdlineW, spoofedCmdlineLen * sizeof(wchar_t), NULL)) {
         goto cleanup;
