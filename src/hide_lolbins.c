@@ -30,7 +30,7 @@ int main() {
 
     // Convert realCmdline to wide character string
     int lolBinCommandLen = MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, NULL, 0);
-    wchar_t *lolBinCommandW = (wchar_t *)malloc(lolBinCommand * sizeof(wchar_t));
+    wchar_t *lolBinCommandW = (wchar_t *)malloc(lolBinCommandLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, lolBinCommandW, lolBinCommandLen);
 
     // Create suspended process
