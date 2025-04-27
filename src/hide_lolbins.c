@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stddef.h>
 #include <string.h>
 #include <windows.h>
 #include <winternl.h>
+#include <stddef.h>
 
 void replaceArguementsWithSpaces(const char *original, char *modified) {
     const char *firstSpace = strchr(original, ' ');
