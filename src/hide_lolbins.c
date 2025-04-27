@@ -28,6 +28,11 @@ int main() {
     wchar_t *realCmdlineW = (wchar_t *)malloc(realCmdlineLen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, realCmdlineW, realCmdlineLen);
 
+    // Convert realCmdline to wide character string
+    int lolBinCommandLen = MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, NULL, 0);
+    wchar_t *lolBinCommandW = (wchar_t *)malloc(lolBinCommand * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, lolBinCommand, -1, lolBinCommandW, lolBinCommandLen);
+
     // Create suspended process
     printf("[+] Creating the process suspended\n");
     STARTUPINFOEX si = { sizeof(si) };
@@ -69,7 +74,11 @@ int main() {
     // Resume process
     printf("[+] Resuming the main thread\n");
     ResumeThread(pi.hThread);
-    
+
+    // Change command line
+    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, lolBinCommandW, lolBinCommandLen * sizeof(wchar_t), NULL)) {
+        goto cleanup;
+    }
     
     return TRUE;
 cleanup:
