@@ -71,16 +71,14 @@ int main() {
         goto cleanup;
     }
 
+    // Change command line
+    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, 7, 4) {
+        goto cleanup;
+    }
+
     // Resume process
     printf("[+] Resuming the main thread\n");
     ResumeThread(pi.hThread);
-
-    sleep(1000);
-
-    // Change command line
-    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Buffer, spoofedCmdlineW, spoofedCmdlineLen * sizeof(wchar_t), NULL)) {
-        goto cleanup;
-    }
     
     return TRUE;
 cleanup:
