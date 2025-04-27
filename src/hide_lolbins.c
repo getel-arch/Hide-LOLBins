@@ -74,7 +74,7 @@ int main() {
 
     DWORD newUnicodeLen = 7;
     // Change command line buffer length
-    if (!WriteProcessMemory(pi.hProcess, procParams.CommandLine.Length, (void*)&newUnicodeLen, 4)) {
+    if (!WriteProcessMemory(pi.hProcess, (char *)procParams.CommandLine + offsetof(RTL_USER_PROCESS_PARAMETERS, CommandLine.Length), (void*)&newUnicodeLen, 4)) {
         goto cleanup;
     }
 
